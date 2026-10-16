@@ -16,7 +16,6 @@
 
 - (void) applicationDidFinishLaunching: (NSNotification *) aNotification
 {
-    PFMoveToApplicationsFolderIfNecessary();
     [self.mainWindow makeKeyAndOrderFront:self];
     [self.mainWindow center];
     [self setupEnhancementTable];
@@ -57,9 +56,6 @@
          ];
     }
     
-    // MUST MAKE SURE CDMMANAGER CAN ALSO LAUNCH
-    NSString *cmd = [NSString stringWithFormat:@"xattr -r -d com.apple.quarantine '%@'", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/CDMManager/CDMManager.app"]];
-    [self runTask: [NSArray arrayWithObjects:@"-c", cmd, nil]];
 }
 
 
@@ -68,11 +64,12 @@
     if ([self isMacBook])
     {
         [self.enhancementArrayController addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                                     @"Closed-Display Mode Fail-Safe", @"Title",
-                                                     @"This enhancement acts as a fail-safe for Amphetamine's closed-display mode feature.\n\nInstalling this enhancement will put a script on your Mac that periodically checks whether Amphetamine is running. If Amphetamine is not running, the script will ensure that your Mac reverts to the expected behavior of sleeping when your Mac's display is closed.\n\nIf Amphetamine is running, this script checks to make sure a session is active. If a session is not active, the script will ensure your Mac reverts to the expected behavior of sleeping when your Mac's display is closed. ", @"Description",
-                                                     kClosedDisplayPlist, @"PlistFile",
-                                                     kClosedDisplay, @"PlistName",
+                                                     @"Closed-Display Mode Watchdog", @"Title",
+                                                     @"This enhancement keeps Amphetamine's closed-display mode on for the whole session.\n\nOn Apple silicon Macs, closed-display mode can turn off while a session is still running, for example after plugging in or unplugging power, or after starting a new session without ending the old one. Your Mac then sleeps as soon as you close the lid.\n\nInstalling this enhancement will put a script on your Mac that checks every 10 seconds. If a session turned closed-display mode on and it later turns off while that same session is still running, the script turns it back on. Sessions that allow sleep when the display is closed are left alone.\n\nRequires Amphetamine Power Protect.", @"Description",
+                                                     kCDMWatchdogPlist, @"PlistFile",
+                                                     kCDMWatchdog, @"PlistName",
                                                      nil]];
+        
     }
     
     [self.enhancementArrayController addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -364,6 +361,21 @@
         NSString *model = [NSString stringWithUTF8String: m];
     
         macIsBook = ([model rangeOfString: @"Book"].location == NSNotFound) ? NO : YES;
+        
+        // APPLE SILICON LAPTOPS REPORT A GENERIC MODEL (E.G. "Mac17,3"), SO ALSO CHECK FOR AN INTERNAL BATTERY
+        if (!macIsBook)
+        {
+            NSTask *task = [[NSTask alloc] init];
+            [task setLaunchPath:@"/usr/bin/pmset"];
+            [task setArguments:[NSArray arrayWithObjects:@"-g", @"batt", nil]];
+            NSPipe *out = [NSPipe pipe];
+            [task setStandardOutput:out];
+            [task launch];
+            [task waitUntilExit];
+            NSData *data = [[out fileHandleForReading] readDataToEndOfFile];
+            NSString *batt = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            macIsBook = ([batt rangeOfString: @"InternalBattery"].location != NSNotFound);
+        }
              
         free(m);
     }

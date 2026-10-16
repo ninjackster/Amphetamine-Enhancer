@@ -9,11 +9,12 @@
 #import <Cocoa/Cocoa.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <sys/sysctl.h>
-@import LetsMove;
-//@import Sparkle;
 
 #define kClosedDisplay @"amphetamine-enhancer-cdmManager"
 #define kClosedDisplayPlist @"amphetamine-enhancer-cdmManager.plist"
+
+#define kCDMWatchdog @"amphetamine-enhancer-cdmWatchdog"
+#define kCDMWatchdogPlist @"amphetamine-enhancer-cdmWatchdog.plist"
 
 #define kAllProcesses @"amphetamine-enhancer-allProcesses"
 #define kAllProcessesPlist @"amphetamine-enhancer-allProcesses.plist"

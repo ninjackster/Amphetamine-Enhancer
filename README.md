@@ -1,3 +1,36 @@
+# Amphetamine Enhancer (maintained fork)
+
+This fork keeps Amphetamine Enhancer working on Apple silicon and current macOS. The original repo has not been updated since 2020. All credit for Amphetamine and the Enhancer goes to William Gustafson ([x74353](https://github.com/x74353)).
+
+## What changed in this fork
+
+- New enhancement: Closed-Display Mode Watchdog. On Apple silicon laptops, Amphetamine's closed-display mode can turn off while a session is still running, and then the Mac sleeps as soon as the lid closes. This happens after plugging in or unplugging power, or after starting a new session without ending the old one ([#46](https://github.com/x74353/Amphetamine-Enhancer/issues/46)). The watchdog checks every 10 seconds. If the current session had closed-display mode on and it turns off, the watchdog turns it back on. Sessions that allow sleep with the lid closed are left alone.
+- The watchdog also replaces the old Closed-Display Mode Fail-Safe. If Amphetamine quits or crashes with closed-display mode on, it turns sleep back on. The old fail-safe read Amphetamine's settings directly, and macOS no longer allows that.
+- Apple silicon laptops now get the closed-display enhancements. The old check looked for "Book" in the model name, and Apple silicon laptops report names like `Mac17,3`.
+- Universal build (Apple silicon and Intel). The Intel-only Sparkle and LetsMove frameworks are removed, so there are no in-app updates from the original feed.
+
+## Requirements
+
+- Amphetamine 5.x from the Mac App Store
+- [Amphetamine Power Protect](https://x74353.github.io/Amphetamine-Power-Protect/), which the watchdog uses to run `pmset -a disablesleep` without a password
+
+## Build
+
+Open `Xcode Project/Amphetamine Enhancer.xcodeproj` and build the Release scheme, or run:
+
+```
+cd "Xcode Project"
+xcodebuild -project "Amphetamine Enhancer.xcodeproj" -scheme "Amphetamine Enhancer" -configuration Release ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO build
+```
+
+Move the app to /Applications, open it, select Closed-Display Mode Watchdog and click Install. The watchdog logs each action to `~/Library/Logs/amphetamine-enhancer-cdmWatchdog.log`.
+
+## Known limitation
+
+The watchdog cannot read Amphetamine's settings, so it learns whether a session uses closed-display mode by watching for it to turn on. If you tick "Allow system sleep when display is closed" in the middle of a session, end that session and start a new one so the watchdog does not turn closed-display mode back on.
+
+---
+
 # Welcome to Amphetamine Enhancer
 
 <B>NOTE: Amphetamine Enhancer requires Amphetamine 5.0. Visit the Mac App Store to upgrade.</B>

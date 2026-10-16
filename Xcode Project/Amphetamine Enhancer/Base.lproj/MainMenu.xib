@@ -87,13 +87,6 @@
                                     <action selector="showAboutWindow:" target="Voe-Tx-rLC" id="2Nk-Q0-iV6"/>
                                 </connections>
                             </menuItem>
-                            <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                            <menuItem title="Check For Updates..." id="rgd-ns-9cd">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="checkForUpdates:" target="ZTi-ga-qFx" id="T32-JH-f8v"/>
-                                </connections>
-                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="2px-Qf-mH7"/>
                             <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW">
                                 <connections>
@@ -587,6 +580,5 @@ https://github.com/sparkle-project/Sparkle</string>
             </view>
             <point key="canvasLocation" x="35" y="134"/>
         </window>
-        <customObject id="ZTi-ga-qFx" customClass="SUUpdater"/>
     </objects>
 </document>
